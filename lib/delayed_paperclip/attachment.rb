@@ -4,8 +4,10 @@ module DelayedPaperclip
     def self.included(base)
       base.send :include, InstanceMethods
       base.send :attr_accessor, :job_is_processing
+
       base.alias_method_chain :post_processing, :delay
       base.alias_method_chain :post_processing=, :delay
+
       base.alias_method_chain :save, :prepare_enqueueing
     end
 
@@ -35,19 +37,14 @@ module DelayedPaperclip
       end
 
       def split_processing?
-        options[:only_process] && delayed_options &&
+        options[:only_process] &&
+          delayed_options &&
           options[:only_process] != delayed_options[:only_process]
       end
 
       def processing?
         column_name = :"#{@name}_processing?"
         @instance.respond_to?(column_name) && @instance.send(column_name)
-      end
-
-      def processing_style?(style)
-        return false if !processing?
-
-        !split_processing? || delayed_options[:only_process].include?(style)
       end
 
       def delayed_only_process

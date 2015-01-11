@@ -201,7 +201,6 @@ shared_examples "base usage" do
   end
 
   describe "only_process option" do
-
     # TODO: This test must be faulty
     # https://github.com/jrgifford/delayed_paperclip/issues/40
     context "passed just to delayed_paperclip argument" do
@@ -216,12 +215,14 @@ shared_examples "base usage" do
       end
     end
 
+    # BAD
     context "inherits from paperclip options" do
       before :each do
         reset_class "Dummy", :with_processed => true, :paperclip => { :only_process => [:thumbnail] }
       end
 
       it "reprocesses just those" do
+        pending "decision about error raising; breaking change"
         Paperclip::Attachment.any_instance.expects(:reprocess!).with(:thumbnail).once
         dummy.save!
         process_jobs
