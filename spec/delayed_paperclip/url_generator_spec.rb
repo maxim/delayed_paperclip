@@ -94,9 +94,9 @@ describe DelayedPaperclip::UrlGenerator do
         end
 
         context "with delayed_options" do
-          before :each do
-            attachment.stubs(:delayed_options).returns "something"
-          end
+          # before :each do
+          #   attachment.stubs(:delayed_options).returns "something"
+          # end
 
           context "without processing_image_url" do
             before :each do
@@ -111,7 +111,8 @@ describe DelayedPaperclip::UrlGenerator do
 
           context "with processing_image_url" do
             before :each do
-              attachment.stubs(:processing_image_url).returns "/processing/image.jpg"
+              @processing_image_url = "/processing/image.jpg"
+              attachment.stubs(:processing_image_url).returns @processing_image_url
             end
 
             context "and is processing" do
@@ -120,7 +121,7 @@ describe DelayedPaperclip::UrlGenerator do
               end
 
               it "gets processing url" do
-                subject.most_appropriate_url.should == "/processing/image.jpg"
+                subject.most_appropriate_url.should ==  @processing_image_url
               end
             end
 
@@ -136,6 +137,53 @@ describe DelayedPaperclip::UrlGenerator do
     end
   end
 
+  # TBD if useful
+  # processing style needs some unit testing but is covered by integration
+  # describe "#processing_style?" do
+  #   let(:style) { :background }
+  #   let(:processing_style?) { dummy.image.processing_style?(style) }
+
+  #   context "without a processing column" do
+  #     let(:dummy_options) { { with_processed: true, process_column: false } }
+
+  #     specify { expect(processing_style?).to be_false }
+  #   end
+
+  #   context "with a processing column" do
+  #     context "when not processing" do
+  #       before { dummy.image_processing = false }
+
+  #       specify { expect(processing_style?).to be_false }
+  #     end
+
+  #     context "when processing" do
+  #       before { dummy.image_processing = true }
+
+  #       context "when not split processing" do
+  #         specify { expect(processing_style?).to be_true }
+  #       end
+
+  #       context "when split processing" do
+  #         let(:dummy_options) { {
+  #           paperclip: {
+  #             styles: {
+  #               online: "400x400x",
+  #               background: "600x600x"
+  #             },
+  #             only_process: [:online]
+  #           },
+
+  #           delayed_paperclip: {
+  #             only_process: [:background]
+  #           }
+  #         }}
+
+  #         specify { expect(processing_style?).to be }
+  #       end
+  #     end
+  #   end
+  # end
+
   describe "#timestamp_possible?" do
     subject { DelayedPaperclip::UrlGenerator.new(attachment, {})}
 
@@ -146,17 +194,6 @@ describe DelayedPaperclip::UrlGenerator do
 
       it "is false" do
         subject.timestamp_possible?.should be_false
-      end
-    end
-
-    context "without delayed_default_url" do
-      before :each do
-        subject.stubs(:delayed_default_url?).returns false
-      end
-
-      it "goes up the chain" do
-        subject.expects(:timestamp_possible_without_processed?)
-        subject.timestamp_possible?
       end
     end
   end

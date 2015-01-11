@@ -52,11 +52,12 @@ module DelayedPaperclip
       paperclip_definitions[name][:delayed] = {}
 
       # Set Defaults
-      only_process_default = paperclip_definitions[name][:only_process]
-      only_process_default ||= []
+
+      # Breaking CHANGE from
+      # does not inherit from paperclip only_process options
       {
         :priority => 0,
-        :only_process => only_process_default,
+        :only_process => nil,
         :url_with_processing => DelayedPaperclip.options[:url_with_processing],
         :processing_image_url => DelayedPaperclip.options[:processing_image_url],
         :queue => nil
